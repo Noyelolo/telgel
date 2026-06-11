@@ -13,7 +13,6 @@
         }
 
         body {
-            /* Хайр дурлалын ягаан, улаан өнгийн уусгалттай градиент */
             background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
             height: 100vh;
             display: flex;
@@ -35,7 +34,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.2);
             max-width: 650px;
-            z-index: 2; /* Эможиноос дээгүүр байлгах */
+            z-index: 2; 
         }
 
         h1 {
@@ -81,6 +80,7 @@
             color: white;
             box-shadow: 0 5px 20px rgba(164, 176, 190, 0.5);
             z-index: 10;
+            transition: left 0.2s ease, top 0.2s ease; /* Гөлгөр шилжилт нэмэв */
         }
 
         #message {
@@ -93,9 +93,10 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        /* Эможи борооны загвар */
+        /* Эможи борооны загвар (дэлгэцийн дээрээс эхлэх) */
         .emoji-drop {
-            position: absolute;
+            position: fixed;
+            top: -60px; /* Дэлгэцийн харагдах хэсгээс дээгүүр байрлуулна */
             font-size: 30px;
             animation: fall linear forwards;
             z-index: 1;
@@ -103,11 +104,11 @@
 
         @keyframes fall {
             0% {
-                transform: translateY(-50px) rotate(0deg);
+                transform: translateY(0px) rotate(0deg);
                 opacity: 1;
             }
             100% {
-                transform: translateY(105vh) rotate(360deg);
+                transform: translateY(110vh) rotate(360deg);
                 opacity: 0;
             }
         }
@@ -135,39 +136,41 @@
         const noBtn = document.getElementById('no-btn');
         const messageDiv = document.getElementById('message');
 
-        // YES товчлуур дарахад ажиллах хэсэг
+        // YES товчлуур дарахад
         yesBtn.addEventListener('click', () => {
             messageDiv.innerHTML = "Баяр хүргье! Та насан туршийнхаа хувийн IT техникийн дэмжлэгийг (болон хайр сэтгэлийг) оллоо! 💻❤️";
-            noBtn.style.display = 'none'; // No товчийг алга болгох
-            startEmojiRain(); // Эможи бороо оруулах
+            noBtn.style.display = 'none'; 
+            startEmojiRain(); 
         });
 
-        // NO товчлуур дээр хулгана очиход зугтах функц
+        // NO товчлуур дээр хулгана очиход зугтах функц (дэлгэцээс гарахгүйгээр)
         noBtn.addEventListener('mouseover', () => {
-            // Дэлгэцийн хэмжээг авах
+            noBtn.style.position = 'fixed';
+            
+            // Дэлгэцийн болон товчлуурын хэмжээг нарийн авах
             const screenWidth = window.innerWidth;
             const screenHeight = window.innerHeight;
-            
-            // Товчны хэмжээ
             const btnWidth = noBtn.offsetWidth;
             const btnHeight = noBtn.offsetHeight;
 
-            // Санамсаргүй байрлал үүсгэх (текстээс зайлсхийж дэлгэц дүүрэн хөдөлгөх ба absolute болгоно)
-            noBtn.style.position = 'fixed';
-            
-            let randomX = Math.floor(Math.random() * (screenWidth - btnWidth));
-            let randomY = Math.floor(Math.random() * (screenHeight - btnHeight));
+            // Товчлуур дэлгэцийн захад тулахгүй байх хязгаар (дор хаяж 40px зай үлдээнэ)
+            const padding = 40;
+            const maxX = screenWidth - btnWidth - padding;
+            const maxY = screenHeight - btnHeight - padding;
 
-            // Хэрвээ төв хэсэг дэх үндсэн хайрцаг болон текстийн орчимд оччихвол зайлуулахын тулд дахин тооцоолох
-            const avoidCenterX = screenWidth / 2 - 350;
-            const avoidCenterEndX = screenWidth / 2 + 350;
-            const avoidCenterY = screenHeight / 2 - 250;
-            const avoidCenterEndY = screenHeight / 2 + 250;
+            let randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
+            let randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+
+            // Төв хэсгийн кнопууд болон текстээс хол байлгах шалгалт
+            const avoidCenterX = screenWidth / 2 - 300;
+            const avoidCenterEndX = screenWidth / 2 + 300;
+            const avoidCenterY = screenHeight / 2 - 200;
+            const avoidCenterEndY = screenHeight / 2 + 200;
 
             if (randomX > avoidCenterX && randomX < avoidCenterEndX && randomY > avoidCenterY && randomY < avoidCenterEndY) {
-                // Төвөөс холдуулахын тулд баруун эсвэл зүүн булан руу шилжүүлнэ
-                randomX = randomX < screenWidth / 2 ? Math.floor(Math.random() * 200) : screenWidth - btnWidth - Math.floor(Math.random() * 200);
-                randomY = randomY < screenHeight / 2 ? Math.floor(Math.random() * 200) : screenHeight - btnHeight - Math.floor(Math.random() * 200);
+                // Хэрвээ гол руу унавал аль нэг булан руу зайлуулах
+                randomX = randomX < screenWidth / 2 ? padding : screenWidth - btnWidth - padding;
+                randomY = randomY < screenHeight / 2 ? padding : screenHeight - btnHeight - padding;
             }
 
             noBtn.style.left = `${randomX}px`;
@@ -189,20 +192,20 @@
         function startEmojiRain() {
             const emojis = ['❤️', '💻', '⚙️', '✨', '🚀', '☕', '💖', '👩‍❤️‍👨'];
             
-            // 35 ширхэг эможи үүсгэх
-            for (let i = 0; i < 35; i++) {
+            for (let i = 0; i < 40; i++) {
                 const emoji = document.createElement('div');
                 emoji.classList.add('emoji-drop');
                 emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
                 
-                // Санамсаргүй X тэнхлэг болон хурд, хэмжээ
-                emoji.style.left = Math.random() * 100 + 'vw';
-                emoji.style.animationDuration = Math.random() * 2 + 3 + 's'; // 3-5 секунд үргэлжилнэ
-                emoji.style.fontSize = Math.random() * 20 + 20 + 'px';
+                // Дэлгэцийн өргөний дагуу дурын цэгээс унагах
+                emoji.style.left = Math.random() * 95 + 'vw';
+                // 2.5 - 4.5 секундийн хооронд унах хурд
+                emoji.style.animationDuration = Math.random() * 2 + 2.5 + 's'; 
+                emoji.style.fontSize = Math.random() * 20 + 25 + 'px';
                 
                 document.body.appendChild(emoji);
                 
-                // Хугацаа дуусахад устгах
+                // Хугацаа дуусахад DOM-оос устгах
                 setTimeout(() => {
                     emoji.remove();
                 }, 5000);

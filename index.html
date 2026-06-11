@@ -1,238 +1,268 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Romantic IT Quiz</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Romantic IT Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            overflow: hidden; 
-            text-align: center;
-            padding: 20px;
-            position: relative;
-        }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #c471ed 0%, #f64f59 50%, #f7971e 100%);
+      overflow: hidden;
+    }
 
-        .container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            padding: 40px 50px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 650px;
-            z-index: 2; 
-        }
+    #quiz-root {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
 
-        h1 {
-            font-size: 34px;
-            margin-bottom: 30px;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+    .bg-blobs { position: absolute; inset: 0; pointer-events: none; }
+    .blob { position: absolute; border-radius: 50%; opacity: 0.18; }
 
-        .buttons-wrapper {
-            position: relative;
-            width: 100%;
-            min-height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 80px;
-            margin-top: 30px;
-        }
+    .card {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 20px;
+      padding: 40px 44px;
+      max-width: 560px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      z-index: 3;
+      backdrop-filter: blur(16px);
+    }
 
-        button {
-            padding: 16px 40px;
-            font-size: 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    .heart-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block;
+      animation: hpulse 1.8s ease-in-out infinite;
+    }
 
-        #yes-btn {
-            background-color: #ff4757;
-            color: white;
-            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.5);
-            z-index: 5;
-        }
+    @keyframes hpulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
 
-        #yes-btn:hover {
-            background-color: #ff2b48;
-            transform: scale(1.08);
-        }
+    .title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.35;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
 
-        #no-btn {
-            background-color: #a4b0be;
-            color: white;
-            box-shadow: 0 5px 20px rgba(164, 176, 190, 0.5);
-            position: absolute; 
-            transition: left 0.3s ease, top 0.3s ease;
-            z-index: 5;
-        }
+    .subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 32px;
+      font-weight: 600;
+    }
 
-        #message {
-            margin-top: 35px;
-            font-size: 22px;
-            font-weight: 600;
-            color: #fff200;
-            min-height: 70px;
-            max-width: 500px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
+    .btn-yes {
+      background: #fff;
+      color: #e8175d;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 44px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(232,23,93,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+      margin: 0 auto 20px;
+    }
 
-        /* Солют буудах эффект (Fireworks) */
-        .firework-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 105vh;
-            pointer-events: none;
-            z-index: 1;
-        }
+    .btn-yes:hover {
+      transform: scale(1.07);
+      box-shadow: 0 8px 32px rgba(232,23,93,0.5);
+    }
 
-        .firework {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            animation: explode 1s ease-out forwards;
-        }
+    #no-btn {
+      background: rgba(255,255,255,0.22);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      border: 2px solid rgba(255,255,255,0.55);
+      border-radius: 50px;
+      padding: 14px 44px;
+      cursor: pointer;
+      position: absolute;
+      z-index: 20;
+      white-space: nowrap;
+      transition: left 0.1s, top 0.1s;
+    }
 
-        @keyframes explode {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-                box-shadow: 0 0 0 0 #ff4757, 0 0 0 0 #fff200, 0 0 0 0 #70a1ff;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: scale(80);
-                opacity: 0;
-                box-shadow: 0 0 20px 10px #ff4757, 0 0 40px 20px #fff200, 0 0 60px 30px #70a1ff;
-            }
-        }
-        
-        @media (max-width: 600px) {
-            h1 { font-size: 26px; }
-            button { padding: 12px 30px; font-size: 18px; }
-            .buttons-wrapper { gap: 40px; }
-        }
-    </style>
+    .message-box {
+      min-height: 56px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff200;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .success-msg {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.6;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .fw-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    @keyframes burst {
+      0% { transform: scale(0); opacity: 1; }
+      60% { opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="firework-container" id="fireworks"></div>
+<div id="quiz-root">
+  <div class="bg-blobs">
+    <div class="blob" style="width:320px;height:320px;background:#fff;top:-80px;left:-100px;"></div>
+    <div class="blob" style="width:220px;height:220px;background:#f7971e;bottom:-50px;right:-60px;"></div>
+    <div class="blob" style="width:150px;height:150px;background:#c471ed;bottom:80px;left:60px;"></div>
+    <div class="blob" style="width:110px;height:110px;background:#fff;top:100px;right:40px;"></div>
+  </div>
 
-    <div class="container">
-        <h1>Would you date an introverted IT guy?</h1>
-        <div class="buttons-wrapper">
-            <button id="yes-btn">Yes</button>
-            <button id="no-btn">No</button>
-        </div>
-        <div id="message"></div>
-    </div>
+  <div class="fw-container" id="fw-container"></div>
 
-    <script>
-        const yesBtn = document.getElementById('yes-btn');
-        const noBtn = document.getElementById('no-btn');
-        const messageDiv = document.getElementById('message');
-        const fireworksContainer = document.getElementById('fireworks');
+  <div class="card" id="card">
+    <span class="heart-icon">💻❤️</span>
+    <div class="title">Would you date an introverted IT guy?</div>
+    <div class="subtitle">Think carefully before answering...</div>
+    <button class="btn-yes" id="yes-btn">Yes 💖</button>
+    <div class="message-box" id="message"></div>
+  </div>
 
-        // Эхлэлд No товчлуурыг байрлуулах
-        noBtn.style.left = '60%';
-        noBtn.style.top = '35%';
+  <button id="no-btn">No</button>
+</div>
 
-        // YES товчлуур дарахад
-        yesBtn.addEventListener('click', () => {
-            messageDiv.innerHTML = "Баяр хүргье! Та насан туршийнхаа хувийн IT техникийн дэмжлэгийг (болон хайр сэтгэлийг) оллоо! 💻❤️";
-            noBtn.style.display = 'none'; 
-            triggerFireworks(); 
-        });
+<script>
+(function(){
+  const root  = document.getElementById('quiz-root');
+  const card  = document.getElementById('card');
+  const yesBtn = document.getElementById('yes-btn');
+  const noBtn  = document.getElementById('no-btn');
+  const msg    = document.getElementById('message');
+  const fw     = document.getElementById('fw-container');
 
-        // NO товчлуур дээр хулгана очиход зугтах функц
-        noBtn.addEventListener('mouseover', () => {
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-            const btnWidth = noBtn.offsetWidth;
-            const btnHeight = noBtn.offsetHeight;
+  const texts = [
+    "Энэ товч яг л тэр залуу шиг comfort zone-оосоо зугтаж байна! 🏃‍♂️💨",
+    "Гэрийн Wi-Fi тасрах вий, дахин нэг бодоорой! 📶",
+    "Алдааг шалгаад үзээрэй — 'No' гэдэг нь системд байхгүй утга! 💻",
+    "Keyboard-ийн цаана нуугдаад зугтааж байна... 🙈",
+    "404: Энэ хариулт олдсонгүй. Зөв хариулт нэг л байна! 🔍",
+    "Bug report: Буруу товч дарагдлаа. Засвар хийнэ үү! 🐛",
+  ];
 
-            const padding = 50;
-            const maxX = screenWidth - btnWidth - padding;
-            const maxY = screenHeight - btnHeight - padding;
+  function placeNo() {
+    const rw = root.offsetWidth;
+    const rh = root.offsetHeight;
+    const bw = noBtn.offsetWidth || 130;
+    const bh = noBtn.offsetHeight || 52;
+    const pad = 16;
 
-            let randomX, randomY;
-            let isTooClose = true;
+    const cardLeft   = card.offsetLeft;
+    const cardTop    = card.offsetTop;
+    const cardRight  = cardLeft + card.offsetWidth;
+    const cardBottom = cardTop  + card.offsetHeight;
 
-            while (isTooClose) {
-                randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
-                randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+    for (let i = 0; i < 80; i++) {
+      const x = pad + Math.random() * (rw - bw - pad * 2);
+      const y = pad + Math.random() * (rh - bh - pad * 2);
+      const overlapX = x + bw > cardLeft && x < cardRight;
+      const overlapY = y + bh > cardTop  && y < cardBottom;
+      if (!(overlapX && overlapY)) {
+        noBtn.style.left = x + 'px';
+        noBtn.style.top  = y + 'px';
+        return;
+      }
+    }
+    // fallback
+    noBtn.style.left = pad + 'px';
+    noBtn.style.top  = pad + 'px';
+  }
 
-                const containerRect = document.querySelector('.container').getBoundingClientRect();
-                
-                if (
-                    randomX + btnWidth < containerRect.left || 
-                    randomX > containerRect.right || 
-                    randomY + btnHeight < containerRect.top || 
-                    randomY > containerRect.bottom
-                ) {
-                    isTooClose = false;
-                }
-            }
+  // initial placement: just below/beside the card
+  requestAnimationFrame(() => {
+    noBtn.style.left = (root.offsetWidth / 2 + card.offsetWidth / 2 - noBtn.offsetWidth / 2) + 'px';
+    noBtn.style.top  = (root.offsetHeight / 2 + card.offsetHeight / 2 - noBtn.offsetHeight / 2 - 10) + 'px';
+  });
 
-            noBtn.style.left = `${randomX}px`;
-            noBtn.style.top = `${randomY}px`;
-            
-            const funTexts = [
-                "Энэ товч яг л тэр залуу шиг 'комфорт зона'-оосоо гарч чадахгүй зугтаж байна! 🏃‍♂️💨",
-                "Гэрийн Wi-Fi тасрах вий дээ, дахин нэг бодоорой! 📶",
-                "Хулганаас зугтах ч яамай, системийн алдаагаа олж засварлана даа. 🔄",
-                "Алдааг дахин нэг шалгаад үзээрэй, 'No' гэдэг чинь системд байхгүй утга шүү! 💻",
-                "Клобоны ард нуугдаад зугтааж байна даа... 😄"
-            ];
-            const randomText = funTexts[Math.floor(Math.random() * funTexts.length)];
-            messageDiv.innerHTML = randomText;
-        });
+  noBtn.addEventListener('mouseenter', () => {
+    placeNo();
+    msg.textContent = texts[Math.floor(Math.random() * texts.length)];
+  });
 
-        // Солют буудах функц
-        function triggerFireworks() {
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => {
-                    const firework = document.createElement('div');
-                    firework.classList.add('firework');
-                    
-                    firework.style.left = Math.random() * 80 + 10 + '%';
-                    firework.style.top = Math.random() * 60 + 20 + '%';
-                    
-                    const colors = ['#ff4757', '#fff200', '#70a1ff', '#2ed573', '#ffa502'];
-                    firework.style.animation = `explode 1.2s ease-out forwards`;
-                    
-                    fireworksContainer.appendChild(firework);
+  noBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    placeNo();
+    msg.textContent = texts[Math.floor(Math.random() * texts.length)];
+  });
 
-                    setTimeout(() => {
-                        firework.remove();
-                    }, 1200);
-                }, i * 200); 
-            }
+  yesBtn.addEventListener('click', () => {
+    noBtn.style.display = 'none';
+    msg.innerHTML = '<div class="success-msg">🎉 Баяр хүргье!<br>Та насан туршийнхаа хувийн IT техникийн дэмжлэг болон хайр сэтгэлийг оллоо! 💻❤️</div>';
+    fireworks();
+  });
+
+  function fireworks() {
+    const colors = ['#ff4757','#fff200','#70a1ff','#2ed573','#ffa502','#ff6b81','#eccc68','#a29bfe','#fd79a8'];
+    for (let w = 0; w < 5; w++) {
+      setTimeout(() => {
+        const cx = 15 + Math.random() * 70;
+        const cy = 10 + Math.random() * 70;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const n = 14 + Math.floor(Math.random() * 8);
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2;
+          const d = 8 + Math.random() * 10;
+          const px = cx + Math.cos(a) * d;
+          const py = cy + Math.sin(a) * d;
+          const size = 4 + Math.random() * 5;
+          const isBar = Math.random() > 0.5;
+          const el = document.createElement('div');
+          el.style.cssText = `position:absolute;left:${Math.max(1,Math.min(99,px))}%;top:${Math.max(1,Math.min(99,py))}%;width:${size}px;height:${isBar?size*2.5:size}px;border-radius:${isBar?'2px':'50%'};background:${color};pointer-events:none;animation:burst ${0.9+Math.random()*0.5}s ease-out ${Math.random()*0.15}s forwards;`;
+          fw.appendChild(el);
+          setTimeout(() => el.remove(), 1800);
         }
-    </script>
+        const flash = document.createElement('div');
+        flash.style.cssText = `position:absolute;left:${cx}%;top:${cy}%;width:18px;height:18px;border-radius:50%;background:#fff;pointer-events:none;animation:burst 0.5s ease-out forwards;`;
+        fw.appendChild(flash);
+        setTimeout(() => flash.remove(), 600);
+      }, w * 300 + Math.random() * 80);
+    }
+  }
+})();
+</script>
+
 </body>
 </html>

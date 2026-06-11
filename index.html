@@ -81,7 +81,7 @@
             background-color: #a4b0be;
             color: white;
             box-shadow: 0 5px 20px rgba(164, 176, 190, 0.5);
-            position: absolute; /* Текстийн хэсгээс салгаж чөлөөтэй хөдөлгөхөд ашиглана */
+            position: absolute; 
             transition: left 0.3s ease, top 0.3s ease;
             z-index: 5;
         }
@@ -157,7 +157,7 @@
         const messageDiv = document.getElementById('message');
         const fireworksContainer = document.getElementById('fireworks');
 
-        // Эхлэлд No товчлуурыг яг товчлуурын хэсэгт байрлуулна
+        // Эхлэлд No товчлуурыг байрлуулах
         noBtn.style.left = '60%';
         noBtn.style.top = '35%';
 
@@ -175,7 +175,6 @@
             const btnWidth = noBtn.offsetWidth;
             const btnHeight = noBtn.offsetHeight;
 
-            // Дэлгэцийн захаас 50px зайтай байх хязгаар
             const padding = 50;
             const maxX = screenWidth - btnWidth - padding;
             const maxY = screenHeight - btnHeight - padding;
@@ -183,15 +182,12 @@
             let randomX, randomY;
             let isTooClose = true;
 
-            // Текст болон үндсэн цонхноос хол зай гарах хүртэл санамсаргүй координат олно
             while (isTooClose) {
                 randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
                 randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
 
-                // Үндсэн контейнерийн дэлгэц дээрх байрлалыг шалгах
                 const containerRect = document.querySelector('.container').getBoundingClientRect();
                 
-                // Хэрвээ үндсэн цонхны ойролцоо унасан бол үгүй гэж үзэн дахин шалгана
                 if (
                     randomX + btnWidth < containerRect.left || 
                     randomX > containerRect.right || 
@@ -205,7 +201,6 @@
             noBtn.style.left = `${randomX}px`;
             noBtn.style.top = `${randomY}px`;
             
-            // Хөгжилтэй үгс
             const funTexts = [
                 "Энэ товч яг л тэр залуу шиг 'комфорт зона'-оосоо гарч чадахгүй зугтаж байна! 🏃‍♂️💨",
                 "Гэрийн Wi-Fi тасрах вий дээ, дахин нэг бодоорой! 📶",
@@ -224,11 +219,9 @@
                     const firework = document.createElement('div');
                     firework.classList.add('firework');
                     
-                    // Дэлгэцийн дурын хэсгээс гаргах
                     firework.style.left = Math.random() * 80 + 10 + '%';
                     firework.style.top = Math.random() * 60 + 20 + '%';
                     
-                    // Өнгө сонгох
                     const colors = ['#ff4757', '#fff200', '#70a1ff', '#2ed573', '#ffa502'];
                     firework.style.animation = `explode 1.2s ease-out forwards`;
                     
@@ -237,7 +230,7 @@
                     setTimeout(() => {
                         firework.remove();
                     }, 1200);
-                }, i * 200); // 0.2 секундын зайтай ар араас нь буудна
+                }, i * 200); 
             }
         }
     </script>

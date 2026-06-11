@@ -44,14 +44,15 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .buttons {
+        .buttons-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 50px;
+            gap: 80px;
             margin-top: 30px;
-            width: 100%;
-            min-height: 80px;
         }
 
         button {
@@ -68,6 +69,7 @@
             background-color: #ff4757;
             color: white;
             box-shadow: 0 5px 20px rgba(255, 71, 87, 0.5);
+            z-index: 5;
         }
 
         #yes-btn:hover {
@@ -79,8 +81,9 @@
             background-color: #a4b0be;
             color: white;
             box-shadow: 0 5px 20px rgba(164, 176, 190, 0.5);
-            z-index: 10;
-            transition: left 0.2s ease, top 0.2s ease; /* Гөлгөр шилжилт нэмэв */
+            position: absolute; /* Текстийн хэсгээс салгаж чөлөөтэй хөдөлгөхөд ашиглана */
+            transition: left 0.3s ease, top 0.3s ease;
+            z-index: 5;
         }
 
         #message {
@@ -93,38 +96,55 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        /* Эможи борооны загвар (дэлгэцийн дээрээс эхлэх) */
-        .emoji-drop {
-            position: fixed;
-            top: -60px; /* Дэлгэцийн харагдах хэсгээс дээгүүр байрлуулна */
-            font-size: 30px;
-            animation: fall linear forwards;
+        /* Солют буудах эффект (Fireworks) */
+        .firework-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 105vh;
+            pointer-events: none;
             z-index: 1;
         }
 
-        @keyframes fall {
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
             0% {
-                transform: translateY(0px) rotate(0deg);
+                transform: scale(1);
+                opacity: 1;
+                box-shadow: 0 0 0 0 #ff4757, 0 0 0 0 #fff200, 0 0 0 0 #70a1ff;
+            }
+            50% {
                 opacity: 1;
             }
             100% {
-                transform: translateY(110vh) rotate(360deg);
+                transform: scale(80);
                 opacity: 0;
+                box-shadow: 0 0 20px 10px #ff4757, 0 0 40px 20px #fff200, 0 0 60px 30px #70a1ff;
             }
         }
         
         @media (max-width: 600px) {
             h1 { font-size: 26px; }
             button { padding: 12px 30px; font-size: 18px; }
-            .buttons { gap: 25px; }
+            .buttons-wrapper { gap: 40px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="firework-container" id="fireworks"></div>
+
     <div class="container">
         <h1>Would you date an introverted IT guy?</h1>
-        <div class="buttons">
+        <div class="buttons-wrapper">
             <button id="yes-btn">Yes</button>
             <button id="no-btn">No</button>
         </div>
@@ -135,42 +155,51 @@
         const yesBtn = document.getElementById('yes-btn');
         const noBtn = document.getElementById('no-btn');
         const messageDiv = document.getElementById('message');
+        const fireworksContainer = document.getElementById('fireworks');
+
+        // Эхлэлд No товчлуурыг яг товчлуурын хэсэгт байрлуулна
+        noBtn.style.left = '60%';
+        noBtn.style.top = '35%';
 
         // YES товчлуур дарахад
         yesBtn.addEventListener('click', () => {
             messageDiv.innerHTML = "Баяр хүргье! Та насан туршийнхаа хувийн IT техникийн дэмжлэгийг (болон хайр сэтгэлийг) оллоо! 💻❤️";
             noBtn.style.display = 'none'; 
-            startEmojiRain(); 
+            triggerFireworks(); 
         });
 
-        // NO товчлуур дээр хулгана очиход зугтах функц (дэлгэцээс гарахгүйгээр)
+        // NO товчлуур дээр хулгана очиход зугтах функц
         noBtn.addEventListener('mouseover', () => {
-            noBtn.style.position = 'fixed';
-            
-            // Дэлгэцийн болон товчлуурын хэмжээг нарийн авах
             const screenWidth = window.innerWidth;
             const screenHeight = window.innerHeight;
             const btnWidth = noBtn.offsetWidth;
             const btnHeight = noBtn.offsetHeight;
 
-            // Товчлуур дэлгэцийн захад тулахгүй байх хязгаар (дор хаяж 40px зай үлдээнэ)
-            const padding = 40;
+            // Дэлгэцийн захаас 50px зайтай байх хязгаар
+            const padding = 50;
             const maxX = screenWidth - btnWidth - padding;
             const maxY = screenHeight - btnHeight - padding;
 
-            let randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
-            let randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+            let randomX, randomY;
+            let isTooClose = true;
 
-            // Төв хэсгийн кнопууд болон текстээс хол байлгах шалгалт
-            const avoidCenterX = screenWidth / 2 - 300;
-            const avoidCenterEndX = screenWidth / 2 + 300;
-            const avoidCenterY = screenHeight / 2 - 200;
-            const avoidCenterEndY = screenHeight / 2 + 200;
+            // Текст болон үндсэн цонхноос хол зай гарах хүртэл санамсаргүй координат олно
+            while (isTooClose) {
+                randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
+                randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
 
-            if (randomX > avoidCenterX && randomX < avoidCenterEndX && randomY > avoidCenterY && randomY < avoidCenterEndY) {
-                // Хэрвээ гол руу унавал аль нэг булан руу зайлуулах
-                randomX = randomX < screenWidth / 2 ? padding : screenWidth - btnWidth - padding;
-                randomY = randomY < screenHeight / 2 ? padding : screenHeight - btnHeight - padding;
+                // Үндсэн контейнерийн дэлгэц дээрх байрлалыг шалгах
+                const containerRect = document.querySelector('.container').getBoundingClientRect();
+                
+                // Хэрвээ үндсэн цонхны ойролцоо унасан бол үгүй гэж үзэн дахин шалгана
+                if (
+                    randomX + btnWidth < containerRect.left || 
+                    randomX > containerRect.right || 
+                    randomY + btnHeight < containerRect.top || 
+                    randomY > containerRect.bottom
+                ) {
+                    isTooClose = false;
+                }
             }
 
             noBtn.style.left = `${randomX}px`;
@@ -188,27 +217,27 @@
             messageDiv.innerHTML = randomText;
         });
 
-        // Эможи бороо оруулах функц
-        function startEmojiRain() {
-            const emojis = ['❤️', '💻', '⚙️', '✨', '🚀', '☕', '💖', '👩‍❤️‍👨'];
-            
-            for (let i = 0; i < 40; i++) {
-                const emoji = document.createElement('div');
-                emoji.classList.add('emoji-drop');
-                emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-                
-                // Дэлгэцийн өргөний дагуу дурын цэгээс унагах
-                emoji.style.left = Math.random() * 95 + 'vw';
-                // 2.5 - 4.5 секундийн хооронд унах хурд
-                emoji.style.animationDuration = Math.random() * 2 + 2.5 + 's'; 
-                emoji.style.fontSize = Math.random() * 20 + 25 + 'px';
-                
-                document.body.appendChild(emoji);
-                
-                // Хугацаа дуусахад DOM-оос устгах
+        // Солют буудах функц
+        function triggerFireworks() {
+            for (let i = 0; i < 6; i++) {
                 setTimeout(() => {
-                    emoji.remove();
-                }, 5000);
+                    const firework = document.createElement('div');
+                    firework.classList.add('firework');
+                    
+                    // Дэлгэцийн дурын хэсгээс гаргах
+                    firework.style.left = Math.random() * 80 + 10 + '%';
+                    firework.style.top = Math.random() * 60 + 20 + '%';
+                    
+                    // Өнгө сонгох
+                    const colors = ['#ff4757', '#fff200', '#70a1ff', '#2ed573', '#ffa502'];
+                    firework.style.animation = `explode 1.2s ease-out forwards`;
+                    
+                    fireworksContainer.appendChild(firework);
+
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 1200);
+                }, i * 200); // 0.2 секундын зайтай ар араас нь буудна
             }
         }
     </script>
